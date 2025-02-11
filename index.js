@@ -1,23 +1,13 @@
-// querySelector= HTML의 모든것을 선택할 수 잇음: 태그이름, 클래스명, 아이디명 모두 선택가능 선택할 때 css 규칙을 따라서 작성함
-// 예) class="newClass" => '.newClass'
-// id="newId" => '#id'
-// ul div => 'ul div'
-// ul div.newClass => 'ul div.newClass'
-// const body = document.querySelector("body")
-// body.style.backgroundColor = "coral"
-// const h1 = document.querySelector("header h1")
-// h1.style.color = "coral"
+const db = localStorage;
+const data = db.getItem("list");
+//null= 아무것도 없는값 //object memory
+//undefined= 아무것도 없음
 
-// getElementById = id값만 그래서 그냥 '' 안에 적어주면됨
-// 예) id="item" => ('item')
-// document.querySelector("input").id = "item"
-// const item = document.getElementById("item")
-// item.style.border = "1px solid"
-
-// innerHTML = 해당 태그 안에 새로운 자식요소를 넣을 때 사용함
-// 자식요소는 태그들 문자열에 담아서 사용해도 되지만. 변수를 같이 사용하려면 ``사용해서 하면 개꿀.
-
-let list = [];
+// console.log(typeof data);
+const newData = JSON.parse(data);
+console.log(newData);
+console.log(typeof newData);
+let list = newData ?? []; //?? 앞에 조건이 만족되지 않을떄 안전빵으로 초기값
 
 const rendering = () => {
   const ul = document.querySelector("ul");
@@ -83,8 +73,13 @@ form.addEventListener(
     // list.push()
     list.unshift(item);
 
+    console.log(list);
+    db.setItem("list", JSON.stringify(list));
+
     rendering();
 
     input.value = "";
+
+    console.log(db.getItem("item"));
   }
 );
