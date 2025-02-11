@@ -1,56 +1,66 @@
 const db = localStorage;
 const data = db.getItem("list");
-//null= 아무것도 없는값 //object memory
-//undefined= 아무것도 없음
-
-// console.log(typeof data);
 const newData = JSON.parse(data);
-console.log(newData);
-console.log(typeof newData);
-let list = newData ?? []; //?? 앞에 조건이 만족되지 않을떄 안전빵으로 초기값
+let list = newData ?? [];
 
 const rendering = () => {
   const ul = document.querySelector("ul");
+  ul.innerHTML = "";
 
-  ul.innerHTML = null;
-
-  for (
-    let i = 0;
-    i < list.length;
-    i = i + 1 // i += 1 // i++
-  ) {
+  list.forEach((item, i) => {
     const button = document.createElement("button");
-
     button.innerText = "삭제";
     button.onclick = () => {
       list.splice(i, 1);
-
+      db.setItem("list", JSON.stringify(list)); // 로컬 스토리지 업데이트
       rendering();
     };
 
     const p = document.createElement("p");
-    p.innerText = list[i];
+    p.innerText = item;
     const div = document.createElement("div");
+
+    let isEditing = false;
+    const cancel = document.createElement("button");
+    const confirm = document.createElement("button");
+    cancel.innerText = "취소";
+    confirm.innerText = "수정";
+
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.columnGap = "10px";
+
+    cancel.addEventListener("click", () => {
+      isEditing = false;
+      div.innerHTML = "";
+      div.append(p, button);
+    });
+
+    confirm.addEventListener("click", () => {
+      list[i] = newInput.value;
+      db.setItem("list", JSON.stringify(list)); // 로컬 스토리지 업데이트
+      isEditing = false;
+      rendering();
+      alert("수정되었습니다.");
+    });
+
+    const newInput = document.createElement("input");
+    newInput.value = item; // 기존 값 유지
+    wrap.append(confirm, cancel);
+
+    div.addEventListener("click", () => {
+      if (isEditing) return;
+      isEditing = true;
+      div.innerHTML = "";
+      div.append(newInput, wrap);
+    });
 
     div.append(p, button);
 
     const li = document.createElement("li");
     li.append(div);
-
     ul.append(li);
-
-    //   const tag = `
-    //     <li>
-    //         <div>
-    //             <p>${list[i]}</p>
-    //             ${button}
-    //         </div>
-    //     </li>
-    //     `
-    //   console.log(tag)
-    //   number += i
-    //   li += tag
-  }
+  });
 };
 
 rendering();
@@ -58,28 +68,15 @@ rendering();
 const form = document.querySelector("form");
 const input = document.getElementById("item");
 
-form.addEventListener(
-  "submit",
-
-  (event) => {
-    event.preventDefault(); // 새로고침 방지 // form 태그 한정
-
-    const item = input.value;
-    if (item.length === 0) {
-      alert("장 볼 물건을 입력해주세요.");
-      return input.focus();
-    }
-
-    // list.push()
-    list.unshift(item);
-
-    console.log(list);
-    db.setItem("list", JSON.stringify(list));
-
-    rendering();
-
-    input.value = "";
-
-    console.log(db.getItem("item"));
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const item = input.value;
+  if (item.length === 0) {
+    alert("장 볼 물건을 입력해주세요.");
+    return input.focus();
   }
-);
+  list.unshift(item);
+  db.setItem("list", JSON.stringify(list)); // 로컬 스토리지 업데이트
+  rendering();
+  input.value = "";
+});
